@@ -1,0 +1,14 @@
+name: flutter_map_tappable_polyline
+description: A tappable Polyline for flutter_map
+version: 0.0.1
+authors:
+  - Nicolas Perraut <nicolas@ownweb.fr>
+homepage: https://github.com/OwnWeb/flutter_map_tappable_polyline
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_map: ^0.8.2
