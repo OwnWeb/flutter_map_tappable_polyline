@@ -27,23 +27,23 @@ class TaggedPolyline extends Polyline {
 
   TaggedPolyline(
       {points,
-        strokeWidth = 1.0,
-        color = const Color(0xFF00FF00),
-        borderStrokeWidth = 0.0,
-        borderColor = const Color(0xFFFFFF00),
-        gradientColors,
-        colorsStop,
-        isDotted = false,
-        this.tag})
+      strokeWidth = 1.0,
+      color = const Color(0xFF00FF00),
+      borderStrokeWidth = 0.0,
+      borderColor = const Color(0xFFFFFF00),
+      gradientColors,
+      colorsStop,
+      isDotted = false,
+      this.tag})
       : super(
-      points: points,
-      strokeWidth: strokeWidth,
-      color: color,
-      borderStrokeWidth: borderStrokeWidth,
-      borderColor: borderColor,
-      gradientColors: gradientColors,
-      colorsStop: colorsStop,
-      isDotted: isDotted);
+            points: points,
+            strokeWidth: strokeWidth,
+            color: color,
+            borderStrokeWidth: borderStrokeWidth,
+            borderColor: borderColor,
+            gradientColors: gradientColors,
+            colorsStop: colorsStop,
+            isDotted: isDotted);
 }
 
 class TappablePolylineLayer extends StatelessWidget {
@@ -87,16 +87,16 @@ class TappablePolylineLayer extends StatelessWidget {
           child: GestureDetector(
               onTapUp: (TapUpDetails details) {
                 TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
-                        (TaggedPolyline polylineOpt) => polylineOpt.offsets
+                    (TaggedPolyline polylineOpt) => polylineOpt.offsets
                         .firstWhere(
                             (Offset offset) =>
-                        (offset.dx / 10).round().toDouble() * 10 ==
-                            (details.localPosition.dx / 10).round() *
-                                10 &&
-                            (offset.dy / 10).round().toDouble() * 10 ==
-                                (details.localPosition.dy / 10).round() *
-                                    10,
-                        orElse: () => null) is Offset,
+                                (offset.dx / 10).round().toDouble() * 10 ==
+                                    (details.localPosition.dx / 10).round() *
+                                        10 &&
+                                (offset.dy / 10).round().toDouble() * 10 ==
+                                    (details.localPosition.dy / 10).round() *
+                                        10,
+                            orElse: () => null) is Offset,
                     orElse: () => null);
 
                 if (polyline is TaggedPolyline) onTap(polyline);
