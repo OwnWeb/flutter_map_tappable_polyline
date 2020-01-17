@@ -1,14 +1,42 @@
-# flutter_map_tappable_polyline
+# Flutter Map Tappable Polyline
 
-A tappable Polyline for flutter_map
+[![pub package](https://img.shields.io/pub/v/flutter_map_tappable_polyline.svg)](https://pub.dartlang.org/packages/flutter_map_tappable_polyline)
 
-## Getting Started
+A Polyline with `onTap` event listener  
+This is a plugin for [flutter_map](https://github.com/johnpryan/flutter_map) package
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+## Usage
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+Add flutter_map and  flutter_map_tappable_polyline to your pubspec:
+
+```yaml
+dependencies:
+  flutter_map: any
+  flutter_map_tappable_polyline: any # or the latest version on Pub
+```
+
+Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`.
+
+```dart
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      options: new MapOptions(
+        plugins: [
+          TappablePolylineMapPlugin(),
+        ],
+      ),
+      layers: [
+        TileLayerOptions(
+          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c'],
+        ),
+        TappablePolylineLayerOptions(
+          polylines: TaggedPolyline(
+            tag: "My Polyline", // An optional tag to distinguish polylines in callback
+            // ...all other Polyline options
+          ),
+          onTap: (TaggedPolyline polyline) => print(polyline.tag))
+      ],
+    );
+  }
+```
