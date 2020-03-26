@@ -3,7 +3,6 @@ library flutter_map_tappable_polyline;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map_tappable_polyline/gesture_recognizer.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
   bool supportsLayer(LayerOptions options) =>
@@ -85,21 +84,22 @@ class TappablePolylineLayer extends StatelessWidget {
         }
 
         return Container(
-          child: RawGestureDetector(
-              gestures: <Type, GestureRecognizerFactory>{
-                SingleTapGestureRecognizer:
-                    GestureRecognizerFactoryWithHandlers<
-                        SingleTapGestureRecognizer>(
-                  () => SingleTapGestureRecognizer(
-                    validatePointerLocation: (event) =>
-                        _getPolylineFromEvent(event) is TaggedPolyline,
-                    onTapUp: (PointerEvent event) {
-                      TaggedPolyline polyline = _getPolylineFromEvent(event);
-                      if (polyline is TaggedPolyline) onTap(polyline);
-                    },
-                  ),
-                  (SingleTapGestureRecognizer instance) {},
-                )
+          child: GestureDetector(
+              onTapUp: (TapUpDetails details) {
+                TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
+                    (TaggedPolyline polylineOpt) => polylineOpt.offsets
+                        .firstWhere(
+                            (Offset offset) =>
+                                (offset.dx / 10).round().toDouble() * 10 ==
+                                    (details.localPosition.dx / 10).round() *
+                                        10 &&
+                                (offset.dy / 10).round().toDouble() * 10 ==
+                                    (details.localPosition.dy / 10).round() *
+                                        10,
+                            orElse: () => null) is Offset,
+                    orElse: () => null);
+
+                if (polyline is TaggedPolyline) onTap(polyline);
               },
               child: Stack(
                 children: [
@@ -113,19 +113,5 @@ class TappablePolylineLayer extends StatelessWidget {
         );
       },
     );
-  }
-
-  TaggedPolyline _getPolylineFromEvent(PointerEvent event) {
-    TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
-        (TaggedPolyline polylineOpt) => polylineOpt.offsets.firstWhere(
-            (Offset offset) =>
-                (offset.dx / 10).round().toDouble() * 10 ==
-                    (event.localPosition.dx / 10).round() * 10 &&
-                (offset.dy / 10).round().toDouble() * 10 ==
-                    (event.localPosition.dy / 10).round() * 10,
-            orElse: () => null) is Offset,
-        orElse: () => null);
-
-    return polyline;
   }
 }
