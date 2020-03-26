@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
           plugins: [
             TappablePolylineMapPlugin(),
           ],
-          center: LatLng(45.1313258,5.5171205),
+          center: LatLng(45.1313258, 5.5171205),
           zoom: 11.0,
         ),
         layers: [

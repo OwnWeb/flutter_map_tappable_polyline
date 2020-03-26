@@ -19,7 +19,11 @@ class TappablePolylineLayerOptions extends LayerOptions {
   final double pointerDistanceTolerance;
   Function onTap = (TaggedPolyline polyline) {};
 
-  TappablePolylineLayerOptions({this.polylines = const [], rebuild, this.onTap, this.pointerDistanceTolerance = 15})
+  TappablePolylineLayerOptions(
+      {this.polylines = const [],
+      rebuild,
+      this.onTap,
+      this.pointerDistanceTolerance = 15})
       : super(rebuild: rebuild);
 }
 
@@ -88,16 +92,24 @@ class TappablePolylineLayer extends StatelessWidget {
           child: GestureDetector(
               onTapUp: (TapUpDetails details) {
                 TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
-                    (TaggedPolyline polylineOpt) => polylineOpt.offsets
-                        .firstWhere(
-                            (Offset offset) =>
-                                (offset.dx / polylineOpts.pointerDistanceTolerance).round().toDouble() * polylineOpts.pointerDistanceTolerance ==
-                                    (details.localPosition.dx / polylineOpts.pointerDistanceTolerance).round() *
-                                        polylineOpts.pointerDistanceTolerance &&
-                                (offset.dy / polylineOpts.pointerDistanceTolerance).round().toDouble() * polylineOpts.pointerDistanceTolerance ==
-                                    (details.localPosition.dy / polylineOpts.pointerDistanceTolerance).round() *
-                                        polylineOpts.pointerDistanceTolerance,
-                            orElse: () => null) is Offset,
+                    (TaggedPolyline polylineOpt) => polylineOpt.offsets.firstWhere(
+                        (Offset offset) =>
+                            (offset.dx / polylineOpts.pointerDistanceTolerance)
+                                        .round()
+                                        .toDouble() *
+                                    polylineOpts.pointerDistanceTolerance ==
+                                (details.localPosition.dx / polylineOpts.pointerDistanceTolerance)
+                                        .round() *
+                                    polylineOpts.pointerDistanceTolerance &&
+                            (offset.dy / polylineOpts.pointerDistanceTolerance)
+                                        .round()
+                                        .toDouble() *
+                                    polylineOpts.pointerDistanceTolerance ==
+                                (details.localPosition.dy /
+                                            polylineOpts.pointerDistanceTolerance)
+                                        .round() *
+                                    polylineOpts.pointerDistanceTolerance,
+                        orElse: () => null) is Offset,
                     orElse: () => null);
 
                 if (polyline is TaggedPolyline) onTap(polyline);
