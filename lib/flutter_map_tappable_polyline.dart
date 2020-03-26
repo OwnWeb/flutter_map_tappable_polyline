@@ -16,9 +16,10 @@ class TappablePolylineMapPlugin extends MapPlugin {
 
 class TappablePolylineLayerOptions extends LayerOptions {
   final List<TaggedPolyline> polylines;
+  final double pointerDistanceTolerance;
   Function onTap = (TaggedPolyline polyline) {};
 
-  TappablePolylineLayerOptions({this.polylines = const [], rebuild, this.onTap})
+  TappablePolylineLayerOptions({this.polylines = const [], rebuild, this.onTap, this.pointerDistanceTolerance = 15})
       : super(rebuild: rebuild);
 }
 
@@ -90,12 +91,12 @@ class TappablePolylineLayer extends StatelessWidget {
                     (TaggedPolyline polylineOpt) => polylineOpt.offsets
                         .firstWhere(
                             (Offset offset) =>
-                                (offset.dx / 10).round().toDouble() * 10 ==
-                                    (details.localPosition.dx / 10).round() *
-                                        10 &&
-                                (offset.dy / 10).round().toDouble() * 10 ==
-                                    (details.localPosition.dy / 10).round() *
-                                        10,
+                                (offset.dx / polylineOpts.pointerDistanceTolerance).round().toDouble() * polylineOpts.pointerDistanceTolerance ==
+                                    (details.localPosition.dx / polylineOpts.pointerDistanceTolerance).round() *
+                                        polylineOpts.pointerDistanceTolerance &&
+                                (offset.dy / polylineOpts.pointerDistanceTolerance).round().toDouble() * polylineOpts.pointerDistanceTolerance ==
+                                    (details.localPosition.dy / polylineOpts.pointerDistanceTolerance).round() *
+                                        polylineOpts.pointerDistanceTolerance,
                             orElse: () => null) is Offset,
                     orElse: () => null);
 
