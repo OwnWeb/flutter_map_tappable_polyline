@@ -15,7 +15,7 @@ dependencies:
   flutter_map_tappable_polyline: any # or the latest version on Pub
 ```
 
-Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`.
+Add it in you FlutterMap and configure it using `TappablePolylineLayerOptions`.
 
 ```dart
   Widget build(BuildContext context) {
