@@ -31,10 +31,12 @@ Add it in you FlutterMap and configure it using `TappablePolylineLayerOptions`.
           subdomains: ['a', 'b', 'c'],
         ),
         TappablePolylineLayerOptions(
-          polylines: TaggedPolyline(
-            tag: "My Polyline", // An optional tag to distinguish polylines in callback
-            // ...all other Polyline options
-          ),
+          polylines: [
+            TaggedPolyline(
+              tag: "My Polyline", // An optional tag to distinguish polylines in callback
+              // ...all other Polyline options
+            ),
+          ],
           onTap: (TaggedPolyline polyline) => print(polyline.tag))
       ],
     );
