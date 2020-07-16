@@ -1,3 +1,6 @@
+## [0.4.0]
+ - Add support for Polyline culling (#5) @Mkohm
+
 ## [0.3.3]
  - Upgrade flutter_map to ^0.10.1
  
