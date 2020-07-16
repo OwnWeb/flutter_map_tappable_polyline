@@ -14,7 +14,7 @@ class TappablePolylineMapPlugin extends MapPlugin {
   }
 }
 
-class TappablePolylineLayerOptions extends LayerOptions {
+class TappablePolylineLayerOptions extends PolylineLayerOptions {
   final List<TaggedPolyline> polylines;
   final double pointerDistanceTolerance;
   Function onTap = (TaggedPolyline polyline) {};
@@ -23,8 +23,9 @@ class TappablePolylineLayerOptions extends LayerOptions {
       {this.polylines = const [],
       rebuild,
       this.onTap,
-      this.pointerDistanceTolerance = 15})
-      : super(rebuild: rebuild);
+      this.pointerDistanceTolerance = 15,
+      polylineCulling = false})
+      : super(rebuild: rebuild, polylineCulling: polylineCulling);
 }
 
 class TaggedPolyline extends Polyline {
@@ -74,6 +75,13 @@ class TappablePolylineLayer extends StatelessWidget {
       builder: (BuildContext context, _) {
         for (var polylineOpt in polylineOpts.polylines) {
           polylineOpt.offsets.clear();
+
+          if (polylineOpts.polylineCulling &&
+              !polylineOpt.boundingBox.isOverlapping(map.bounds)) {
+            // Skip this polyline as it is not within the current map bounds (i.e not visible on screen)
+            continue;
+          }
+
           var i = 0;
           for (var point in polylineOpt.points) {
             var pos = map.project(point);

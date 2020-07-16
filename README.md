@@ -31,6 +31,8 @@ Add it in you FlutterMap and configure it using `TappablePolylineLayerOptions`.
           subdomains: ['a', 'b', 'c'],
         ),
         TappablePolylineLayerOptions(
+          // Will only render visible polylines, increasing performance
+          polylineCulling: true,
           polylines: [
             TaggedPolyline(
               tag: "My Polyline", // An optional tag to distinguish polylines in callback

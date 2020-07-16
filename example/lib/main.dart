@@ -77,15 +77,19 @@ class _MyHomePageState extends State<MyHomePage> {
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             subdomains: ['a', 'b', 'c'],
           ),
-          TappablePolylineLayerOptions(polylines: [
-            TaggedPolyline(
-              tag: "My Polyline",
-              // An optional tag to distinguish polylines in callback
-              points: getPoints(),
-              color: Colors.red,
-              strokeWidth: 3.0,
-            ),
-          ], onTap: (TaggedPolyline polyline) => print(polyline.tag))
+          TappablePolylineLayerOptions(
+              // Will only render visible polylines, increasing performance
+              polylineCulling: true,
+              polylines: [
+                TaggedPolyline(
+                  tag: "My Polyline",
+                  // An optional tag to distinguish polylines in callback
+                  points: getPoints(),
+                  color: Colors.red,
+                  strokeWidth: 3.0,
+                ),
+              ],
+              onTap: (TaggedPolyline polyline) => print(polyline.tag))
         ],
       ),
     );
