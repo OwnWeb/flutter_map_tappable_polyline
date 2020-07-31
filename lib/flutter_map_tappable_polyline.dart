@@ -183,15 +183,6 @@ class TappablePolylineLayer extends StatelessWidget {
                     return;
                   }
                 }
-
-                /*TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
-                    (TaggedPolyline polylineOpt) =>
-                        polylineOpt.offsets.firstWhere((Offset offset) {
-                          return tapCloseToPoint(offset, details);
-                        }, orElse: () => null) is Offset,
-                    orElse: () => null);
-
-                if (polyline is TaggedPolyline) onTap(polyline);*/
               },
               child: Stack(
                 children: [
@@ -214,18 +205,5 @@ class TappablePolylineLayer extends StatelessWidget {
     var distance = sqrt((distancex * distancex) + (distancey * distancey));
 
     return distance;
-  }
-
-  bool tapCloseToPoint(Offset offset, TapUpDetails details) {
-    // Replace pointerdistance with 0 to
-    var tolerance = polylineOpts.pointerDistanceTolerance;
-    var tap = details.localPosition;
-
-    // if tolerance == 1 -> return offset.dx == tap.dx && offset.dy == tap.dy
-
-    return (offset.dx / tolerance).round().toDouble() * tolerance ==
-            (tap.dx / tolerance).round() * tolerance &&
-        (offset.dy / tolerance).round().toDouble() * tolerance ==
-            (tap.dy / tolerance).round() * tolerance;
   }
 }
