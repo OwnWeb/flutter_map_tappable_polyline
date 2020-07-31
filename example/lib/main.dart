@@ -69,8 +69,8 @@ class _MyHomePageState extends State<MyHomePage> {
           plugins: [
             TappablePolylineMapPlugin(),
           ],
-          center: LatLng(45.1313258, 5.5171205),
-          zoom: 11.0,
+          center: LatLng(45.13065, 5.58213),
+          zoom: 18.0,
         ),
         layers: [
           TileLayerOptions(
@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
           TappablePolylineLayerOptions(
               // Will only render visible polylines, increasing performance
               polylineCulling: true,
+              pointerDistanceTolerance: 20,
               polylines: [
                 TaggedPolyline(
                   tag: 'My Polyline',
@@ -89,7 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   strokeWidth: 3.0,
                 ),
               ],
-              onTap: (TaggedPolyline polyline) => print(polyline.tag))
+              onTap: (TaggedPolyline polyline) {
+                print(polyline.tag);
+                setState(() {
+                  // draw a new polyline with the black color
+                  //polyline.color = Colors.black;
+                });
+              })
         ],
       ),
     );
