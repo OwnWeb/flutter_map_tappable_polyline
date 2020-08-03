@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: FlutterMap(
-        options: new MapOptions(
+        options: MapOptions(
           plugins: [
             TappablePolylineMapPlugin(),
           ],
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               polylineCulling: true,
               polylines: [
                 TaggedPolyline(
-                  tag: "My Polyline",
+                  tag: 'My Polyline',
                   // An optional tag to distinguish polylines in callback
                   points: getPoints(),
                   color: Colors.red,

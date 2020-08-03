@@ -5,9 +5,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
+  @override
   bool supportsLayer(LayerOptions options) =>
       options is TappablePolylineLayerOptions;
 
+  @override
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<Null> stream) {
     return TappablePolylineLayer(options, mapState, stream);
@@ -15,6 +17,7 @@ class TappablePolylineMapPlugin extends MapPlugin {
 }
 
 class TappablePolylineLayerOptions extends PolylineLayerOptions {
+  @override
   final List<TaggedPolyline> polylines;
   final double pointerDistanceTolerance;
   Function onTap = (TaggedPolyline polyline) {};
