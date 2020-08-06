@@ -73,7 +73,7 @@ class TappablePolylineLayer extends StatelessWidget {
   /// The flutter_map [MapState]
   final MapState map;
 
-  // what is that stream for?
+  /// The Stream used by flutter_map to notify us when a redraw is required
   final Stream<Null> stream;
 
   TappablePolylineLayer(this.polylineOpts, this.map, this.stream);
