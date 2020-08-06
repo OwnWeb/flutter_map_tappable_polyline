@@ -16,22 +16,33 @@ class TappablePolylineMapPlugin extends MapPlugin {
   }
 }
 
+/// The options allowing tappable polyline tweaks
 class TappablePolylineLayerOptions extends PolylineLayerOptions {
+  /// The list of [TaggedPolyline] which could be tapped
   @override
   final List<TaggedPolyline> polylines;
+
+  /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
   final double pointerDistanceTolerance;
+
+  /// The callback to call when tapping the polyline
   Function onTap = (TaggedPolyline polyline) {};
+
+  /// The ability to render only polylines in current view bounds
+  final bool polylineCulling;
 
   TappablePolylineLayerOptions(
       {this.polylines = const [],
       rebuild,
       this.onTap,
       this.pointerDistanceTolerance = 15,
-      polylineCulling = false})
-      : super(rebuild: rebuild, polylineCulling: polylineCulling);
+      this.polylineCulling = false})
+      : super(rebuild: rebuild);
 }
 
+/// A polyline with a tag
 class TaggedPolyline extends Polyline {
+  /// The name of the polyline
   final String tag;
 
   TaggedPolyline(
@@ -56,8 +67,13 @@ class TaggedPolyline extends Polyline {
 }
 
 class TappablePolylineLayer extends StatelessWidget {
+  /// The options allowing tappable polyline tweaks
   final TappablePolylineLayerOptions polylineOpts;
+
+  /// The flutter_map [MapState]
   final MapState map;
+
+  // what is that stream for?
   final Stream<Null> stream;
 
   TappablePolylineLayer(this.polylineOpts, this.map, this.stream);
