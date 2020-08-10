@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:latlong/latlong.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
   @override
@@ -124,18 +123,16 @@ class TappablePolylineLayer extends StatelessWidget {
               onTapUp: (TapUpDetails details) {
                 // Calculating taps in between points on the polyline. We
                 // iterate over all the segments in the polyline to find any
-                // matches with the tapped point within the
+                // matches with the tapped point within t he
                 // pointerDistanceTolerance.
-                for (var i = 0; i < polylineOpts.polylines.length; i++) {
-                  Polyline currentPolyline = polylineOpts.polylines[i];
-
-                  for (var j = 0; j < currentPolyline.offsets.length - 1; j++) {
+                polylineOpts.polylines.forEach((element) {
+                  for (var j = 0; j < element.offsets.length - 1; j++) {
                     // We consider the points point1, point2 and tap points in a triangle
-                    var point1 = currentPolyline.offsets[j];
-                    var point2 = currentPolyline.offsets[j + 1];
+                    var point1 = element.offsets[j];
+                    var point2 = element.offsets[j + 1];
                     var tap = details.localPosition;
 
-                    // To determine if we have tapped in between two points, we
+                    // To determine if we have tapped in between two po ints, we
                     // calculate the length from the tapped point to the line
                     // created by point1, point2. If this distance is shorter
                     // than the specified threshold, we have detected a tap
@@ -173,16 +170,11 @@ class TappablePolylineLayer extends StatelessWidget {
                     if (height < polylineOpts.pointerDistanceTolerance &&
                         lengthDToOriginalSegment <
                             polylineOpts.pointerDistanceTolerance) {
-                      onTap(currentPolyline);
+                      onTap(element);
                       return;
-                    } else {
-                      // We look in the next pair of points to see if we have a match there
-                      continue;
                     }
-
-                    return;
                   }
-                }
+                });
               },
               child: Stack(
                 children: [
