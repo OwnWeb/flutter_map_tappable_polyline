@@ -29,6 +29,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   Function onTap = (TaggedPolyline polyline) {};
 
   /// The ability to render only polylines in current view bounds
+  @override
   final bool polylineCulling;
 
   TappablePolylineLayerOptions(
@@ -37,7 +38,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
       this.onTap,
       this.pointerDistanceTolerance = 15,
       this.polylineCulling = false})
-      : super(rebuild: rebuild);
+      : super(rebuild: rebuild, polylineCulling: polylineCulling);
 }
 
 /// A polyline with a tag
