@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
           TappablePolylineLayerOptions(
               // Will only render visible polylines, increasing performance
               polylineCulling: true,
+              pointerDistanceTolerance: 20,
               polylines: [
                 TaggedPolyline(
                   tag: 'My Polyline',

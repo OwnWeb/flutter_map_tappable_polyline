@@ -1,5 +1,7 @@
 library flutter_map_tappable_polyline;
 
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -119,28 +121,60 @@ class TappablePolylineLayer extends StatelessWidget {
         return Container(
           child: GestureDetector(
               onTapUp: (TapUpDetails details) {
-                TaggedPolyline polyline = polylineOpts.polylines.firstWhere(
-                    (TaggedPolyline polylineOpt) => polylineOpt.offsets.firstWhere(
-                        (Offset offset) =>
-                            (offset.dx / polylineOpts.pointerDistanceTolerance)
-                                        .round()
-                                        .toDouble() *
-                                    polylineOpts.pointerDistanceTolerance ==
-                                (details.localPosition.dx / polylineOpts.pointerDistanceTolerance)
-                                        .round() *
-                                    polylineOpts.pointerDistanceTolerance &&
-                            (offset.dy / polylineOpts.pointerDistanceTolerance)
-                                        .round()
-                                        .toDouble() *
-                                    polylineOpts.pointerDistanceTolerance ==
-                                (details.localPosition.dy /
-                                            polylineOpts.pointerDistanceTolerance)
-                                        .round() *
-                                    polylineOpts.pointerDistanceTolerance,
-                        orElse: () => null) is Offset,
-                    orElse: () => null);
+                // Calculating taps in between points on the polyline. We
+                // iterate over all the segments in the polyline to find any
+                // matches with the tapped point within t he
+                // pointerDistanceTolerance.
+                polylineOpts.polylines.forEach((currentPolyline) {
+                  for (var j = 0; j < currentPolyline.offsets.length - 1; j++) {
+                    // We consider the points point1, point2 and tap points in a triangle
+                    var point1 = currentPolyline.offsets[j];
+                    var point2 = currentPolyline.offsets[j + 1];
+                    var tap = details.localPosition;
 
-                if (polyline is TaggedPolyline) onTap(polyline);
+                    // To determine if we have tapped in between two po ints, we
+                    // calculate the length from the tapped point to the line
+                    // created by point1, point2. If this distance is shorter
+                    // than the specified threshold, we have detected a tap
+                    // between two points.
+                    //
+                    // We start by calculating the length of all the sides using pythagoras.
+                    var a = distance(point1, point2);
+                    var b = distance(point1, tap);
+                    var c = distance(point2, tap);
+
+                    // To find the height when we only know the lengths of the sides, we can use Herons formula to get the Area.
+                    var semiPerimeter = (a + b + c) / 2.0;
+                    var triangleArea = sqrt(semiPerimeter *
+                        (semiPerimeter - a) *
+                        (semiPerimeter - b) *
+                        (semiPerimeter - c));
+
+                    // We can then finally calculate the length from the tapped point onto the line created by point1, point2.
+                    // Area of triangles is half the area of a rectangle
+                    // area = 1/2 base * height -> height = (2 * area) / base
+                    var height = (2 * triangleArea) / a;
+
+                    // We're not there yet - We need to satisfy the edge case
+                    // where the perpendicular line from the tapped point onto
+                    // the line created by point1, point2 (called point D) is
+                    // outside of the segment point1, point2. We need
+                    // to check if the length from D to the original segment
+                    // (point1, point2) is less than the threshold.
+
+                    var hypotenus = max(b, c);
+                    var newTriangleBase =
+                        sqrt((hypotenus * hypotenus) - (height * height));
+                    var lengthDToOriginalSegment = newTriangleBase - a;
+
+                    if (height < polylineOpts.pointerDistanceTolerance &&
+                        lengthDToOriginalSegment <
+                            polylineOpts.pointerDistanceTolerance) {
+                      onTap(currentPolyline);
+                      return;
+                    }
+                  }
+                });
               },
               child: Stack(
                 children: [
@@ -154,5 +188,14 @@ class TappablePolylineLayer extends StatelessWidget {
         );
       },
     );
+  }
+
+  double distance(Offset point1, Offset point2) {
+    var distancex = (point1.dx - point2.dx).abs();
+    var distancey = (point1.dy - point2.dy).abs();
+
+    var distance = sqrt((distancex * distancex) + (distancey * distancey));
+
+    return distance;
   }
 }
