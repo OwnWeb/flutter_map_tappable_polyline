@@ -125,11 +125,11 @@ class TappablePolylineLayer extends StatelessWidget {
                 // iterate over all the segments in the polyline to find any
                 // matches with the tapped point within t he
                 // pointerDistanceTolerance.
-                polylineOpts.polylines.forEach((element) {
-                  for (var j = 0; j < element.offsets.length - 1; j++) {
+                polylineOpts.polylines.forEach((currentPolyline) {
+                  for (var j = 0; j < currentPolyline.offsets.length - 1; j++) {
                     // We consider the points point1, point2 and tap points in a triangle
-                    var point1 = element.offsets[j];
-                    var point2 = element.offsets[j + 1];
+                    var point1 = currentPolyline.offsets[j];
+                    var point2 = currentPolyline.offsets[j + 1];
                     var tap = details.localPosition;
 
                     // To determine if we have tapped in between two po ints, we
@@ -170,7 +170,7 @@ class TappablePolylineLayer extends StatelessWidget {
                     if (height < polylineOpts.pointerDistanceTolerance &&
                         lengthDToOriginalSegment <
                             polylineOpts.pointerDistanceTolerance) {
-                      onTap(element);
+                      onTap(currentPolyline);
                       return;
                     }
                   }
