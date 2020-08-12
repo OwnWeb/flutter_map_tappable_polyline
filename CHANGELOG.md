@@ -1,3 +1,6 @@
+## [0.5.0]
+ - Detect tapping between polyline points (#8) @Mkohm
+
 ## [0.4.0]
  - Add support for Polyline culling (#5) @Mkohm
 
