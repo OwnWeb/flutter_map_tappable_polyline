@@ -120,7 +120,12 @@ class TappablePolylineLayer extends StatelessWidget {
 
         return Container(
           child: GestureDetector(
+              onDoubleTap: () {
+                map.move(map.center, map.zoom + 1);
+              },
               onTapUp: (TapUpDetails details) {
+                var hit = false;
+
                 // Calculating taps in between points on the polyline. We
                 // iterate over all the segments in the polyline to find any
                 // matches with the tapped point within t he
@@ -171,10 +176,15 @@ class TappablePolylineLayer extends StatelessWidget {
                         lengthDToOriginalSegment <
                             polylineOpts.pointerDistanceTolerance) {
                       onTap(currentPolyline);
+                      hit = true;
                       return;
                     }
                   }
                 });
+
+                if (!hit) {
+                  onTap(null);
+                }
               },
               child: Stack(
                 children: [
