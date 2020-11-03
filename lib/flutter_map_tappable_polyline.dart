@@ -12,8 +12,8 @@ class TappablePolylineMapPlugin extends MapPlugin {
       options is TappablePolylineLayerOptions;
 
   @override
-  Widget createLayer(LayerOptions options, MapState mapState,
-      Stream<Null> stream) {
+  Widget createLayer(
+      LayerOptions options, MapState mapState, Stream<Null> stream) {
     return TappablePolylineLayer(options, mapState, stream);
   }
 }
@@ -34,11 +34,12 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   @override
   final bool polylineCulling;
 
-  TappablePolylineLayerOptions({this.polylines = const [],
-    rebuild,
-    this.onTap,
-    this.pointerDistanceTolerance = 15,
-    this.polylineCulling = false})
+  TappablePolylineLayerOptions(
+      {this.polylines = const [],
+      rebuild,
+      this.onTap,
+      this.pointerDistanceTolerance = 15,
+      this.polylineCulling = false})
       : super(rebuild: rebuild, polylineCulling: polylineCulling);
 }
 
@@ -47,24 +48,25 @@ class TaggedPolyline extends Polyline {
   /// The name of the polyline
   final String tag;
 
-  TaggedPolyline({points,
-    strokeWidth = 1.0,
-    color = const Color(0xFF00FF00),
-    borderStrokeWidth = 0.0,
-    borderColor = const Color(0xFFFFFF00),
-    gradientColors,
-    colorsStop,
-    isDotted = false,
-    this.tag})
+  TaggedPolyline(
+      {points,
+      strokeWidth = 1.0,
+      color = const Color(0xFF00FF00),
+      borderStrokeWidth = 0.0,
+      borderColor = const Color(0xFFFFFF00),
+      gradientColors,
+      colorsStop,
+      isDotted = false,
+      this.tag})
       : super(
-      points: points,
-      strokeWidth: strokeWidth,
-      color: color,
-      borderStrokeWidth: borderStrokeWidth,
-      borderColor: borderColor,
-      gradientColors: gradientColors,
-      colorsStop: colorsStop,
-      isDotted: isDotted);
+            points: points,
+            strokeWidth: strokeWidth,
+            color: color,
+            borderStrokeWidth: borderStrokeWidth,
+            borderColor: borderColor,
+            gradientColors: gradientColors,
+            colorsStop: colorsStop,
+            isDotted: isDotted);
 }
 
 class TappablePolylineLayer extends StatelessWidget {
@@ -118,9 +120,12 @@ class TappablePolylineLayer extends StatelessWidget {
 
         return Container(
           child: GestureDetector(
+              onDoubleTap: () {
+                map.move(map.center, map.zoom + 1);
+              },
               onTapUp: (TapUpDetails details) {
                 var hit = false;
-                
+
                 // Calculating taps in between points on the polyline. We
                 // iterate over all the segments in the polyline to find any
                 // matches with the tapped point within t he
@@ -164,7 +169,7 @@ class TappablePolylineLayer extends StatelessWidget {
 
                     var hypotenus = max(b, c);
                     var newTriangleBase =
-                    sqrt((hypotenus * hypotenus) - (height * height));
+                        sqrt((hypotenus * hypotenus) - (height * height));
                     var lengthDToOriginalSegment = newTriangleBase - a;
 
                     if (height < polylineOpts.pointerDistanceTolerance &&
