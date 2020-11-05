@@ -30,6 +30,9 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   /// The callback to call when tapping the polyline
   Function onTap = (TaggedPolyline polyline) {};
 
+  /// The callback to call when no polyline was hit
+  Function onMiss = () {};
+
   /// The ability to render only polylines in current view bounds
   @override
   final bool polylineCulling;
@@ -38,6 +41,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
       {this.polylines = const [],
       rebuild,
       this.onTap,
+      this.onMiss,
       this.pointerDistanceTolerance = 15,
       this.polylineCulling = false})
       : super(rebuild: rebuild, polylineCulling: polylineCulling);
@@ -86,12 +90,13 @@ class TappablePolylineLayer extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints bc) {
         final size = Size(bc.maxWidth, bc.maxHeight);
-        return _build(context, size, polylineOpts.onTap);
+        return _build(context, size, polylineOpts.onTap, polylineOpts.onMiss);
       },
     );
   }
 
-  Widget _build(BuildContext context, Size size, Function onTap) {
+  Widget _build(
+      BuildContext context, Size size, Function onTap, Function onMiss) {
     return StreamBuilder<void>(
       stream: stream, // a Stream<void> or null
       builder: (BuildContext context, _) {
@@ -183,7 +188,7 @@ class TappablePolylineLayer extends StatelessWidget {
                 });
 
                 if (!hit) {
-                  onTap(null);
+                  onMiss();
                 }
               },
               child: Stack(

@@ -39,7 +39,8 @@ Add it in you FlutterMap and configure it using `TappablePolylineLayerOptions`.
               // ...all other Polyline options
             ),
           ],
-          onTap: (TaggedPolyline polyline) => print(polyline.tag))
+          onTap: (TaggedPolyline polyline) => print(polyline.tag),
+          onMiss: () => print("No polyline tapped"))
       ],
     );
   }
