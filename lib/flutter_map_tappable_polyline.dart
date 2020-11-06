@@ -27,8 +27,11 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
   final double pointerDistanceTolerance;
 
-  /// The callback to call when tapping the polyline
+  /// The callback to call when a polyline was hit by the tap
   Function onTap = (TaggedPolyline polyline) {};
+
+  /// The callback to call when no polyline was hit by the tap
+  Function onMiss = () {};
 
   /// The ability to render only polylines in current view bounds
   @override
@@ -38,6 +41,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
       {this.polylines = const [],
       rebuild,
       this.onTap,
+      this.onMiss,
       this.pointerDistanceTolerance = 15,
       this.polylineCulling = false})
       : super(rebuild: rebuild, polylineCulling: polylineCulling);
@@ -86,12 +90,13 @@ class TappablePolylineLayer extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints bc) {
         final size = Size(bc.maxWidth, bc.maxHeight);
-        return _build(context, size, polylineOpts.onTap);
+        return _build(context, size, polylineOpts.onTap, polylineOpts.onMiss);
       },
     );
   }
 
-  Widget _build(BuildContext context, Size size, Function onTap) {
+  Widget _build(
+      BuildContext context, Size size, Function onTap, Function onMiss) {
     return StreamBuilder<void>(
       stream: stream, // a Stream<void> or null
       builder: (BuildContext context, _) {
@@ -120,7 +125,12 @@ class TappablePolylineLayer extends StatelessWidget {
 
         return Container(
           child: GestureDetector(
+              onDoubleTap: () {
+                map.move(map.center, map.zoom + 1);
+              },
               onTapUp: (TapUpDetails details) {
+                var hit = false;
+
                 // Calculating taps in between points on the polyline. We
                 // iterate over all the segments in the polyline to find any
                 // matches with the tapped point within t he
@@ -171,10 +181,15 @@ class TappablePolylineLayer extends StatelessWidget {
                         lengthDToOriginalSegment <
                             polylineOpts.pointerDistanceTolerance) {
                       onTap(currentPolyline);
+                      hit = true;
                       return;
                     }
                   }
                 });
+
+                if (!hit) {
+                  onMiss();
+                }
               },
               child: Stack(
                 children: [

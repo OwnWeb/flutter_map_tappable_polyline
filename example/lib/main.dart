@@ -90,7 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   strokeWidth: 3.0,
                 ),
               ],
-              onTap: (TaggedPolyline polyline) => print(polyline.tag))
+              onTap: (TaggedPolyline polyline) => print(polyline.tag),
+              onMiss: () {
+                print('No polyline was tapped');
+              })
         ],
       ),
     );
