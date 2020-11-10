@@ -1,3 +1,7 @@
+## [1.0.0]
+ - Allow zooming underlying map with double tap (#12) @Mkohm
+ - Add `onMiss` callback when tap missed polyline (#12) @Mkohm
+
 ## [0.5.0]
  - Detect tapping between polyline points (#8) @Mkohm
 

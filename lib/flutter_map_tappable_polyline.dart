@@ -28,7 +28,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
   final double pointerDistanceTolerance;
 
-  /// The callback to call when tapping the polyline
+  /// The callback to call when a polyline was hit by the tap
   Function onTap = (TaggedPolyline polyline) {};
 
   /// The callback to call when no polyline was hit
