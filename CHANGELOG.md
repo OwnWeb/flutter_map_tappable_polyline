@@ -1,3 +1,6 @@
+## [1.1.0]
+ - Center the map on the tap location when zooming (#17) @Mkohm
+
 ## [1.0.0]
  - Allow zooming underlying map with double tap (#12) @Mkohm
  - Add `onMiss` callback when tap missed polyline (#12) @Mkohm
