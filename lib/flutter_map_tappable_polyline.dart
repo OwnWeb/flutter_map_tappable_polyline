@@ -1,7 +1,7 @@
 library flutter_map_tappable_polyline;
 
 import 'dart:math';
-
+import 'package:latlong/latlong.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -126,7 +126,10 @@ class TappablePolylineLayer extends StatelessWidget {
         return Container(
           child: GestureDetector(
               onDoubleTap: () {
-                map.move(map.center, map.zoom + 1);
+                // For some strange reason i have to add this callback for the onDoubleTapDown callback to be called.
+              },
+              onDoubleTapDown: (TapDownDetails details) {
+                _zoomMap(details, context);
               },
               onTapUp: (TapUpDetails details) {
                 var hit = false;
@@ -212,5 +215,20 @@ class TappablePolylineLayer extends StatelessWidget {
     var distance = sqrt((distancex * distancex) + (distancey * distancey));
 
     return distance;
+  }
+
+  void _zoomMap(TapDownDetails details, BuildContext context) {
+    var newCenter = _offsetToLatLng(
+        details.localPosition, context.size.width, context.size.height);
+    map.move(newCenter, map.zoom + 0.5);
+  }
+
+  LatLng _offsetToLatLng(Offset offset, double width, double height) {
+    var localPoint = CustomPoint(offset.dx, offset.dy);
+    var localPointCenterDistance =
+        CustomPoint((width / 2) - localPoint.x, (height / 2) - localPoint.y);
+    var mapCenter = map.project(map.center);
+    var point = mapCenter - localPointCenterDistance;
+    return map.unproject(point);
   }
 }
