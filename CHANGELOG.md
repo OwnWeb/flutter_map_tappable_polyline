@@ -1,3 +1,6 @@
+## [1.1.1]
+ - Add missing latlong dependency @tuarrep
+
 ## [1.1.0]
  - Center the map on the tap location when zooming (#17) @Mkohm
 
