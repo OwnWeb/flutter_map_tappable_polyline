@@ -39,11 +39,11 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
 
   TappablePolylineLayerOptions(
       {this.polylines = const [],
-        rebuild,
-        this.onTap,
-        this.onMiss,
-        this.pointerDistanceTolerance = 15,
-        this.polylineCulling = false})
+      rebuild,
+      this.onTap,
+      this.onMiss,
+      this.pointerDistanceTolerance = 15,
+      this.polylineCulling = false})
       : super(rebuild: rebuild, polylineCulling: polylineCulling);
 }
 
@@ -54,23 +54,23 @@ class TaggedPolyline extends Polyline {
 
   TaggedPolyline(
       {points,
-        strokeWidth = 1.0,
-        color = const Color(0xFF00FF00),
-        borderStrokeWidth = 0.0,
-        borderColor = const Color(0xFFFFFF00),
-        gradientColors,
-        colorsStop,
-        isDotted = false,
-        this.tag})
+      strokeWidth = 1.0,
+      color = const Color(0xFF00FF00),
+      borderStrokeWidth = 0.0,
+      borderColor = const Color(0xFFFFFF00),
+      gradientColors,
+      colorsStop,
+      isDotted = false,
+      this.tag})
       : super(
-      points: points,
-      strokeWidth: strokeWidth,
-      color: color,
-      borderStrokeWidth: borderStrokeWidth,
-      borderColor: borderColor,
-      gradientColors: gradientColors,
-      colorsStop: colorsStop,
-      isDotted: isDotted);
+            points: points,
+            strokeWidth: strokeWidth,
+            color: color,
+            borderStrokeWidth: borderStrokeWidth,
+            borderColor: borderColor,
+            gradientColors: gradientColors,
+            colorsStop: colorsStop,
+            isDotted: isDotted);
 }
 
 class TappablePolylineLayer extends StatelessWidget {
@@ -226,6 +226,12 @@ class TappablePolylineLayer extends StatelessWidget {
 
     // Forward the onTap call to map.options so that we won't break onTap
     if (map.options.onTap != null) map.options.onTap(latlng);
+  }
+
+  // Todo: Remove this method is v2
+  @Deprecated('Distance method should no longer be part of public API')
+  double distance(Offset point1, Offset point2) {
+    return _distance(point1, point2);
   }
 
   double _distance(Offset point1, Offset point2) {
