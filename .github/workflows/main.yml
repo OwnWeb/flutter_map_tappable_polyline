@@ -25,3 +25,13 @@ jobs:
       with:
         # Required:
         githubToken: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check scores
+      env:
+        # NB: "analysis" is the id set above. Replace it with the one you used if different.
+        TOTAL: ${{ steps.analysis.outputs.total }}
+      run: |
+        if (( $TOTAL < 90 ))
+        then
+          echo Score too low!
+          exit 1
+        fi 

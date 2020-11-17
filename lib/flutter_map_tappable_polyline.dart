@@ -246,7 +246,7 @@ class TappablePolylineLayer extends StatelessWidget {
   LatLng _offsetToLatLng(Offset offset, double width, double height) {
     var localPoint = CustomPoint(offset.dx, offset.dy);
     var localPointCenterDistance =
-    CustomPoint((width / 2) - localPoint.x, (height / 2) - localPoint.y);
+        CustomPoint((width / 2) - localPoint.x, (height / 2) - localPoint.y);
     var mapCenter = map.project(map.center);
     var point = mapCenter - localPointCenterDistance;
     return map.unproject(point);
