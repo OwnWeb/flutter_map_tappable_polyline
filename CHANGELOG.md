@@ -1,3 +1,7 @@
+## [1.2.0]
+ - Trigger only one `onTap` event when multiple polylines are close to each other (#14, #18) @MKohm
+ - [Deprecated]: `TappablePolylineLayer` should no longer be part of public API and is now deprecated 
+
 ## [1.1.1]
  - Add missing latlong dependency @tuarrep
 
@@ -16,10 +20,10 @@
 
 ## [0.3.3]
  - Upgrade flutter_map to ^0.10.1
- 
+
  ## [0.3.2]
  - Upgrade flutter_map to ^0.9.0
- 
+
 ## [0.3.1]
  - Add example
  - Format code
