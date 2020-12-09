@@ -85,8 +85,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 TaggedPolyline(
                   tag: 'My Polyline',
                   // An optional tag to distinguish polylines in callback
-                  points: getPoints(),
+                  points: getPoints(0),
                   color: Colors.red,
+                  strokeWidth: 3.0,
+                ),
+                TaggedPolyline(
+                  tag: 'My 2nd Polyline',
+                  // An optional tag to distinguish polylines in callback
+                  points: getPoints(1),
+                  color: Colors.black,
                   strokeWidth: 3.0,
                 ),
               ],
