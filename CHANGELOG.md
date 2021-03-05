@@ -1,3 +1,7 @@
+## 1.3.0+1
+
+- Fix changelog deprecation notice about `TappablePolylineLayer.distance`
+
 ## 1.3.0
 
 - Update `flutter_map` dependency to 1.11.0 (see issue [#23](https://github.com/OwnWeb/flutter_map_tappable_polyline/issues/23), thanks [@S-Man42](https://github.com/S-Man42))
@@ -6,7 +10,7 @@
 ## 1.2.0
 
  - Trigger only one `onTap` event when multiple polylines are close to each other (#14, #18) @MKohm
- - [Deprecated]: `TappablePolylineLayer` should no longer be part of public API and is now deprecated 
+ - *Deprecated*: `TappablePolylineLayer.distance` should no longer be part of public API and is now deprecated 
 
 ## 1.1.1
 
