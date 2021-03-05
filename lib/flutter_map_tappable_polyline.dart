@@ -1,10 +1,11 @@
 library flutter_map_tappable_polyline;
 
 import 'dart:math';
-import 'package:latlong/latlong.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:latlong/latlong.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
   @override
@@ -30,7 +31,7 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   /// The callback to call when a polyline was hit by the tap
   Function onTap = (TaggedPolyline polyline) {};
 
-  /// The callback to call when no polyline was hit by the tap
+  /// The optional callback to call when no polyline was hit by the tap
   Function onMiss = () {};
 
   /// The ability to render only polylines in current view bounds
@@ -216,7 +217,9 @@ class TappablePolylineLayer extends StatelessWidget {
       var closestToTapKey = candidates.keys.reduce(min);
       onTap(candidates[closestToTapKey]);
     } else {
-      onMiss();
+      if (onMiss is Function) {
+        onMiss();
+      }
     }
   }
 
