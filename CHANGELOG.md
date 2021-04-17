@@ -1,3 +1,7 @@
+## 1.3.1
+
+- Upgrade flutter map
+
 ## 1.3.0+1
 
 - Fix changelog deprecation notice about `TappablePolylineLayer.distance`
