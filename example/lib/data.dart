@@ -1,4 +1,4 @@
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 final lines = [
   [
@@ -1315,5 +1315,5 @@ final lines = [
 ];
 
 List<LatLng> getPoints(int index) {
-  return lines[index].map((e) => LatLng(e[1], e[0])).toList();
+  return lines[index].map((e) => LatLng(e[1] as double, e[0] as double)).toList();
 }

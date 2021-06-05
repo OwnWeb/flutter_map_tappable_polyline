@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
   @override
@@ -15,7 +15,7 @@ class TappablePolylineMapPlugin extends MapPlugin {
   @override
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<Null> stream) {
-    return TappablePolylineLayer(options, mapState, stream);
+    return TappablePolylineLayer(options as TappablePolylineLayerOptions, mapState, stream);
   }
 }
 
@@ -29,10 +29,10 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   final double pointerDistanceTolerance;
 
   /// The callback to call when a polyline was hit by the tap
-  Function onTap = (TaggedPolyline polyline) {};
+  Function? onTap = (TaggedPolyline polyline) {};
 
   /// The optional callback to call when no polyline was hit by the tap
-  Function onMiss = () {};
+  Function? onMiss = () {};
 
   /// The ability to render only polylines in current view bounds
   @override
@@ -51,10 +51,10 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
 /// A polyline with a tag
 class TaggedPolyline extends Polyline {
   /// The name of the polyline
-  final String tag;
+  final String? tag;
 
   TaggedPolyline(
-      {points,
+      {required points,
       strokeWidth = 1.0,
       color = const Color(0xFF00FF00),
       borderStrokeWidth = 0.0,
@@ -97,7 +97,7 @@ class TappablePolylineLayer extends StatelessWidget {
   }
 
   Widget _build(
-      BuildContext context, Size size, Function onTap, Function onMiss) {
+      BuildContext context, Size size, Function? onTap, Function? onMiss) {
     return StreamBuilder<void>(
       stream: stream, // a Stream<void> or null
       builder: (BuildContext context, _) {
@@ -151,7 +151,7 @@ class TappablePolylineLayer extends StatelessWidget {
   }
 
   void _handlePolylineTap(
-      TapUpDetails details, Function onTap, Function onMiss) {
+      TapUpDetails details, Function? onTap, Function? onMiss) {
     var hit = false;
 
     // We might hit close to multiple polylines. We will therefore keep a reference to these in this map.
@@ -205,7 +205,7 @@ class TappablePolylineLayer extends StatelessWidget {
         if (height < polylineOpts.pointerDistanceTolerance &&
             lengthDToOriginalSegment < polylineOpts.pointerDistanceTolerance) {
           var minimum = min(height, lengthDToOriginalSegment);
-          candidates[minimum] = currentPolyline;
+          candidates[minimum] = currentPolyline as TaggedPolyline;
 
           hit = true;
         }
@@ -215,7 +215,7 @@ class TappablePolylineLayer extends StatelessWidget {
     if (hit) {
       // We look up in the map of distances to the tap, and choose the shortest one.
       var closestToTapKey = candidates.keys.reduce(min);
-      onTap(candidates[closestToTapKey]);
+      onTap!(candidates[closestToTapKey]);
     } else {
       if (onMiss is Function) {
         onMiss();
@@ -225,10 +225,10 @@ class TappablePolylineLayer extends StatelessWidget {
 
   void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
     var latlng = _offsetToLatLng(
-        details.localPosition, context.size.width, context.size.height);
+        details.localPosition, context.size!.width, context.size!.height);
 
     // Forward the onTap call to map.options so that we won't break onTap
-    if (map.options.onTap != null) map.options.onTap(latlng);
+    if (map.options.onTap != null) map.options.onTap!(latlng);
   }
 
   // Todo: Remove this method is v2
@@ -248,8 +248,8 @@ class TappablePolylineLayer extends StatelessWidget {
 
   void _zoomMap(TapDownDetails details, BuildContext context) {
     var newCenter = _offsetToLatLng(
-        details.localPosition, context.size.width, context.size.height);
-    map.move(newCenter, map.zoom + 0.5);
+        details.localPosition, context.size!.width, context.size!.height);
+    map.move(newCenter, map.zoom + 0.5, source: MapEventSource.doubleTap);
   }
 
   LatLng _offsetToLatLng(Offset offset, double width, double height) {
