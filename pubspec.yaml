@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^0.13.0
+  flutter_map: ^0.13.1
 
 dev_dependencies:
   pedantic: ^1.9.2

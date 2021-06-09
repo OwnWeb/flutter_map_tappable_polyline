@@ -15,7 +15,8 @@ class TappablePolylineMapPlugin extends MapPlugin {
   @override
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<Null> stream) {
-    return TappablePolylineLayer(options as TappablePolylineLayerOptions, mapState, stream);
+    return TappablePolylineLayer(
+        options as TappablePolylineLayerOptions, mapState, stream);
   }
 }
 
