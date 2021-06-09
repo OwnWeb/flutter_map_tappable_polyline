@@ -1,3 +1,8 @@
+## 2.0.0
+
+- Null safety (see [#27](https://github.com/OwnWeb/flutter_map_tappable_polyline/pull/27/files), thanks [@sbu](https://github.com/sbu-WBT)!)
+- Upgrade `flutter_map` to 0.13.1
+
 ## 1.3.1
 
 - Upgrade flutter map
