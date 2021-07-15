@@ -30,10 +30,11 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   final double pointerDistanceTolerance;
 
   /// The callback to call when a polyline was hit by the tap
-  Function? onTap = (TaggedPolyline polyline) {};
+  void Function(List<TaggedPolyline>)? onTap =
+      (List<TaggedPolyline> polyline) {};
 
   /// The optional callback to call when no polyline was hit by the tap
-  Function? onMiss = () {};
+  void Function()? onMiss = () {};
 
   /// The ability to render only polylines in current view bounds
   @override
@@ -166,10 +167,8 @@ class TappablePolylineLayer extends StatelessWidget {
 
   void _handlePolylineTap(
       TapUpDetails details, Function? onTap, Function? onMiss) {
-    var hit = false;
-
     // We might hit close to multiple polylines. We will therefore keep a reference to these in this map.
-    Map<double, TaggedPolyline> candidates = {};
+    Map<double, List<TaggedPolyline>> candidates = {};
 
     // Calculating taps in between points on the polyline. We
     // iterate over all the segments in the polyline to find any
@@ -219,14 +218,14 @@ class TappablePolylineLayer extends StatelessWidget {
         if (height < polylineOpts.pointerDistanceTolerance &&
             lengthDToOriginalSegment < polylineOpts.pointerDistanceTolerance) {
           var minimum = min(height, lengthDToOriginalSegment);
-          candidates[minimum] = currentPolyline as TaggedPolyline;
 
-          hit = true;
+          candidates[minimum] ??= <TaggedPolyline>[];
+          candidates[minimum]!.add(currentPolyline as TaggedPolyline);
         }
       }
     }
 
-    if (hit) {
+    if (candidates.isNotEmpty) {
       // We look up in the map of distances to the tap, and choose the shortest one.
       var closestToTapKey = candidates.keys.reduce(min);
       onTap!(candidates[closestToTapKey]);
