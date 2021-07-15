@@ -30,10 +30,11 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   final double pointerDistanceTolerance;
 
   /// The callback to call when a polyline was hit by the tap
-  Function? onTap = (TaggedPolyline polyline) {};
+  void Function(List<TaggedPolyline>)? onTap =
+      (List<TaggedPolyline> polyline) {};
 
   /// The optional callback to call when no polyline was hit by the tap
-  Function? onMiss = () {};
+  void Function()? onMiss = () {};
 
   /// The ability to render only polylines in current view bounds
   @override
