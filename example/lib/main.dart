@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // An optional tag to distinguish polylines in callback
                   points: getPoints(0),
                   color: Colors.red,
-                  strokeWidth: 3.0,
+                  strokeWidth: 9.0,
                 ),
                 TaggedPolyline(
                   tag: 'My 2nd Polyline',
@@ -97,8 +97,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.black,
                   strokeWidth: 3.0,
                 ),
+                TaggedPolyline(
+                  tag: 'My 3rd Polyline',
+                  // An optional tag to distinguish polylines in callback
+                  points: getPoints(0),
+                  color: Colors.blue,
+                  strokeWidth: 3.0,
+                ),
               ],
-              onTap: (TaggedPolyline polyline) => print(polyline.tag),
+              onTap: (polylines) => print('Tapped: ' +
+                  polylines.map((polyline) => polyline.tag).join(',')),
               onMiss: () {
                 print('No polyline was tapped');
               })
