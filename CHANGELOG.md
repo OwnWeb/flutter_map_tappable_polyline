@@ -1,3 +1,10 @@
+## 3.0.0
+- [BREAKING] Add support for overlapping lines (see [#31](https://github.com/OwnWeb/flutter_map_tappable_polyline/pull/31)), thanks [@FaFre](https://github.com/FaFre)
+    - The `onTap` callback is now called with a list of `TaggedPolyline` instead of one
+- [BREAKING] Add tap position to onTap and onMiss callbacks
+    - The `onTap` and `onMiss` callbacks now receive the position of the tap that (`TapUpDetails`)
+- Add LayerWidget (see [#31](https://github.com/OwnWeb/flutter_map_tappable_polyline/pull/31)), [@S-Man42](https://github.com/S-Man42)
+
 ## 2.0.0
 
 - Null safety (see [#27](https://github.com/OwnWeb/flutter_map_tappable_polyline/pull/27/files), thanks [@sbu](https://github.com/sbu-WBT)!)
