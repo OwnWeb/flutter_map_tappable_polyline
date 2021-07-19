@@ -75,6 +75,7 @@ class TaggedPolyline extends Polyline {
             isDotted: isDotted);
 }
 
+// A widget to render the layer as a FlutterMap.children
 class TappablePolylineLayerWidget extends StatelessWidget {
   final TappablePolylineLayerOptions options;
 
