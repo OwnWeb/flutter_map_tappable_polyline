@@ -30,11 +30,12 @@ class TappablePolylineLayerOptions extends PolylineLayerOptions {
   final double pointerDistanceTolerance;
 
   /// The callback to call when a polyline was hit by the tap
-  void Function(List<TaggedPolyline>)? onTap =
-      (List<TaggedPolyline> polyline) {};
+  void Function(List<TaggedPolyline>, TapUpDetails tapPosition)? onTap =
+      (List<TaggedPolyline> polyline, TapUpDetails tapPosition) {};
 
   /// The optional callback to call when no polyline was hit by the tap
-  void Function()? onMiss = () {};
+  void Function(TapUpDetails tapPosition)? onMiss =
+      (TapUpDetails tapPosition) {};
 
   /// The ability to render only polylines in current view bounds
   @override
@@ -228,10 +229,10 @@ class TappablePolylineLayer extends StatelessWidget {
     if (candidates.isNotEmpty) {
       // We look up in the map of distances to the tap, and choose the shortest one.
       var closestToTapKey = candidates.keys.reduce(min);
-      onTap!(candidates[closestToTapKey]);
+      onTap!(candidates[closestToTapKey], details);
     } else {
       if (onMiss is Function) {
-        onMiss();
+        onMiss(details);
       }
     }
   }
