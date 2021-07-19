@@ -81,7 +81,8 @@ class TaggedPolyline extends Polyline {
 class TappablePolylineLayerWidget extends StatelessWidget {
   final TappablePolylineLayerOptions options;
 
-  TappablePolylineLayerWidget({Key? key, required this.options}) : super(key: key);
+  TappablePolylineLayerWidget({Key? key, required this.options})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
