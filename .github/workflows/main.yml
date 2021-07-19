@@ -30,7 +30,7 @@ jobs:
         # NB: "analysis" is the id set above. Replace it with the one you used if different.
         TOTAL: ${{ steps.analysis.outputs.total }}
       run: |
-        if (( $TOTAL < 90 ))
+        if (( $TOTAL < 110 ))
         then
           echo Score too low!
           exit 1
