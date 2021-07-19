@@ -75,6 +75,19 @@ class TaggedPolyline extends Polyline {
             isDotted: isDotted);
 }
 
+// A widget to render the layer as a FlutterMap.children
+class TappablePolylineLayerWidget extends StatelessWidget {
+  final TappablePolylineLayerOptions options;
+
+  TappablePolylineLayerWidget({Key? key, required this.options}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final mapState = MapState.maybeOf(context)!;
+    return TappablePolylineLayer(options, mapState, mapState.onMoved);
+  }
+}
+
 class TappablePolylineLayer extends StatelessWidget {
   /// The options allowing tappable polyline tweaks
   final TappablePolylineLayerOptions polylineOpts;
