@@ -1,3 +1,6 @@
+## 3.1.0
+- Upgrade `flutter_map` to 0.14.0
+
 ## 3.0.0
 - [BREAKING] Add support for overlapping lines (see [#31](https://github.com/OwnWeb/flutter_map_tappable_polyline/pull/31)), thanks [@FaFre](https://github.com/FaFre)
     - The `onTap` callback is now called with a list of `TaggedPolyline` instead of one
