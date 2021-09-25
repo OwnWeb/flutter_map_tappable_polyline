@@ -47,7 +47,7 @@ packages:
       name: flutter_map
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.1"
+    version: "0.14.0"
   http:
     dependency: transitive
     description:
@@ -75,7 +75,7 @@ packages:
       name: latlong2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0"
+    version: "0.8.1"
   lists:
     dependency: transitive
     description:
@@ -117,9 +117,9 @@ packages:
       name: pedantic
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   positioned_tap_detector_2:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: positioned_tap_detector_2
       url: "https://pub.dartlang.org"

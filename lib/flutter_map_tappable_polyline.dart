@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 class TappablePolylineMapPlugin extends MapPlugin {
   @override
@@ -239,11 +240,16 @@ class TappablePolylineLayer extends StatelessWidget {
   }
 
   void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
-    var latlng = _offsetToLatLng(
+    final latlng = _offsetToLatLng(
         details.localPosition, context.size!.width, context.size!.height);
 
+    final tapPosition =
+        TapPosition(details.globalPosition, details.localPosition);
+
     // Forward the onTap call to map.options so that we won't break onTap
-    if (map.options.onTap != null) map.options.onTap!(latlng);
+    if (map.options.onTap != null) {
+      map.options.onTap!(tapPosition, latlng);
+    }
   }
 
   // Todo: Remove this method is v2
