@@ -7,11 +7,11 @@ This is a plugin for [flutter_map](https://github.com/johnpryan/flutter_map) pac
 
 ## Usage
 
-Add flutter_map and  flutter_map_tappable_polyline to your pubspec:
+Add [flutter_map](https://github.com/johnpryan/flutter_map) and `flutter_map_tappable_polyline` to your pubspec:
 
 ```yaml
 dependencies:
-  flutter_map: any
+  flutter_map: 0.14.0
   flutter_map_tappable_polyline: any # or the latest version on Pub
 ```
 
