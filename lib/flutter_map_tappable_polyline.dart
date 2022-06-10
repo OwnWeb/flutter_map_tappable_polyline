@@ -14,7 +14,7 @@ class TappablePolylineMapPlugin extends MapPlugin {
 
   @override
   Widget createLayer(
-      LayerOptions options, MapState mapState, Stream<Null> stream) {
+      LayerOptions options, MapState mapState, Stream<void> stream) {
     return TappablePolylineLayer(
         options as TappablePolylineLayerOptions, mapState, stream);
   }
@@ -99,7 +99,7 @@ class TappablePolylineLayer extends StatelessWidget {
   final MapState map;
 
   /// The Stream used by flutter_map to notify us when a redraw is required
-  final Stream<Null> stream;
+  final Stream<void> stream;
 
   TappablePolylineLayer(this.polylineOpts, this.map, this.stream);
 
@@ -157,7 +157,7 @@ class TappablePolylineLayer extends StatelessWidget {
                 children: [
                   for (final polylineOpt in polylineOpts.polylines)
                     CustomPaint(
-                      painter: PolylinePainter(polylineOpt),
+                      painter: PolylinePainter(polylineOpt, false),
                       size: size,
                     ),
                 ],
