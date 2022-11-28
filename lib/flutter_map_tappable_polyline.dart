@@ -7,50 +7,6 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
-class TappablePolylineMapPlugin extends MapPlugin {
-  @override
-  bool supportsLayer(LayerOptions options) =>
-      options is TappablePolylineLayerOptions;
-
-  @override
-  Widget createLayer(
-      LayerOptions options, MapState mapState, Stream<void> stream) {
-    return TappablePolylineLayer(
-        options as TappablePolylineLayerOptions, mapState, stream);
-  }
-}
-
-/// The options allowing tappable polyline tweaks
-class TappablePolylineLayerOptions extends PolylineLayerOptions {
-  /// The list of [TaggedPolyline] which could be tapped
-  @override
-  final List<TaggedPolyline> polylines;
-
-  /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
-  final double pointerDistanceTolerance;
-
-  /// The callback to call when a polyline was hit by the tap
-  void Function(List<TaggedPolyline>, TapUpDetails tapPosition)? onTap =
-      (List<TaggedPolyline> polyline, TapUpDetails tapPosition) {};
-
-  /// The optional callback to call when no polyline was hit by the tap
-  void Function(TapUpDetails tapPosition)? onMiss =
-      (TapUpDetails tapPosition) {};
-
-  /// The ability to render only polylines in current view bounds
-  @override
-  final bool polylineCulling;
-
-  TappablePolylineLayerOptions(
-      {this.polylines = const [],
-      rebuild,
-      this.onTap,
-      this.onMiss,
-      this.pointerDistanceTolerance = 15,
-      this.polylineCulling = false})
-      : super(rebuild: rebuild, polylineCulling: polylineCulling);
-}
-
 /// A polyline with a tag
 class TaggedPolyline extends Polyline {
   /// The name of the polyline
@@ -77,93 +33,91 @@ class TaggedPolyline extends Polyline {
             isDotted: isDotted);
 }
 
-// A widget to render the layer as a FlutterMap.children
-class TappablePolylineLayerWidget extends StatelessWidget {
-  final TappablePolylineLayerOptions options;
-
-  TappablePolylineLayerWidget({Key? key, required this.options})
-      : super(key: key);
-
+class TappablePolylineLayer extends PolylineLayer {
+  /// The list of [TaggedPolyline] which could be tapped
   @override
-  Widget build(BuildContext context) {
-    final mapState = MapState.maybeOf(context)!;
-    return TappablePolylineLayer(options, mapState, mapState.onMoved);
-  }
-}
+  final List<TaggedPolyline> polylines;
 
-class TappablePolylineLayer extends StatelessWidget {
-  /// The options allowing tappable polyline tweaks
-  final TappablePolylineLayerOptions polylineOpts;
+  /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
+  final double pointerDistanceTolerance;
 
-  /// The flutter_map [MapState]
-  final MapState map;
+  /// The callback to call when a polyline was hit by the tap
+  final void Function(List<TaggedPolyline>, TapUpDetails tapPosition)? onTap;
 
-  /// The Stream used by flutter_map to notify us when a redraw is required
-  final Stream<void> stream;
+  /// The optional callback to call when no polyline was hit by the tap
+  final void Function(TapUpDetails tapPosition)? onMiss;
 
-  TappablePolylineLayer(this.polylineOpts, this.map, this.stream);
+  /// The ability to render only polylines in current view bounds
+  @override
+  final bool polylineCulling;
+
+  TappablePolylineLayer(
+      {this.polylines = const [],
+        this.onTap,
+        this.onMiss,
+        this.pointerDistanceTolerance = 15,
+        this.polylineCulling = false,
+        Key? key})
+      : super(polylineCulling: polylineCulling, key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints bc) {
         final size = Size(bc.maxWidth, bc.maxHeight);
-        return _build(context, size, polylineOpts.onTap, polylineOpts.onMiss);
+        return _build(context, size);
       },
     );
   }
 
   Widget _build(
-      BuildContext context, Size size, Function? onTap, Function? onMiss) {
-    return StreamBuilder<void>(
-      stream: stream, // a Stream<void> or null
-      builder: (BuildContext context, _) {
-        for (var polylineOpt in polylineOpts.polylines) {
-          polylineOpt.offsets.clear();
+      BuildContext context, Size size) {
+    FlutterMapState mapState = FlutterMapState.maybeOf(context)!;
 
-          if (polylineOpts.polylineCulling &&
-              !polylineOpt.boundingBox.isOverlapping(map.bounds)) {
-            // Skip this polyline as it is not within the current map bounds (i.e not visible on screen)
-            continue;
-          }
+    for (var polyline in polylines) {
+      polyline.offsets.clear();
 
-          var i = 0;
-          for (var point in polylineOpt.points) {
-            var pos = map.project(point);
-            pos = pos.multiplyBy(map.getZoomScale(map.zoom, map.zoom)) -
-                map.getPixelOrigin();
-            polylineOpt.offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
-            if (i > 0 && i < polylineOpt.points.length) {
-              polylineOpt.offsets
-                  .add(Offset(pos.x.toDouble(), pos.y.toDouble()));
-            }
-            i++;
-          }
+      if (polylineCulling &&
+          !polyline.boundingBox.isOverlapping(mapState.bounds)) {
+        // Skip this polyline as it is not within the current map bounds (i.e not visible on screen)
+        continue;
+      }
+
+      var i = 0;
+      for (var point in polyline.points) {
+        var pos = mapState.project(point);
+        pos = pos.multiplyBy(mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
+            mapState.pixelOrigin;
+        polyline.offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
+        if (i > 0 && i < polyline.points.length) {
+          polyline.offsets
+              .add(Offset(pos.x.toDouble(), pos.y.toDouble()));
         }
+        i++;
+      }
+    }
 
-        return Container(
-          child: GestureDetector(
-              onDoubleTap: () {
-                // For some strange reason i have to add this callback for the onDoubleTapDown callback to be called.
-              },
-              onDoubleTapDown: (TapDownDetails details) {
-                _zoomMap(details, context);
-              },
-              onTapUp: (TapUpDetails details) {
-                _forwardCallToMapOptions(details, context);
-                _handlePolylineTap(details, onTap, onMiss);
-              },
-              child: Stack(
-                children: [
-                  for (final polylineOpt in polylineOpts.polylines)
-                    CustomPaint(
-                      painter: PolylinePainter(polylineOpt, false),
-                      size: size,
-                    ),
-                ],
-              )),
-        );
-      },
+    return Container(
+      child: GestureDetector(
+          onDoubleTap: () {
+            // For some strange reason i have to add this callback for the onDoubleTapDown callback to be called.
+          },
+          onDoubleTapDown: (TapDownDetails details) {
+            _zoomMap(details, context, mapState);
+          },
+          onTapUp: (TapUpDetails details) {
+            _forwardCallToMapOptions(details, context, mapState);
+            _handlePolylineTap(details, onTap, onMiss);
+          },
+          child: Stack(
+            children: [
+              for (final polyline in polylines)
+                CustomPaint(
+                  painter: PolylinePainter(polyline, false),
+                  size: size,
+                ),
+            ],
+          )),
     );
   }
 
@@ -176,7 +130,7 @@ class TappablePolylineLayer extends StatelessWidget {
     // iterate over all the segments in the polyline to find any
     // matches with the tapped point within the
     // pointerDistanceTolerance.
-    for (Polyline currentPolyline in polylineOpts.polylines) {
+    for (Polyline currentPolyline in polylines) {
       for (var j = 0; j < currentPolyline.offsets.length - 1; j++) {
         // We consider the points point1, point2 and tap points in a triangle
         var point1 = currentPolyline.offsets[j];
@@ -217,8 +171,8 @@ class TappablePolylineLayer extends StatelessWidget {
         var newTriangleBase = sqrt((hypotenus * hypotenus) - (height * height));
         var lengthDToOriginalSegment = newTriangleBase - a;
 
-        if (height < polylineOpts.pointerDistanceTolerance &&
-            lengthDToOriginalSegment < polylineOpts.pointerDistanceTolerance) {
+        if (height < pointerDistanceTolerance &&
+            lengthDToOriginalSegment < pointerDistanceTolerance) {
           var minimum = min(height, lengthDToOriginalSegment);
 
           candidates[minimum] ??= <TaggedPolyline>[];
@@ -238,16 +192,16 @@ class TappablePolylineLayer extends StatelessWidget {
     }
   }
 
-  void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
+  void _forwardCallToMapOptions(TapUpDetails details, BuildContext context, FlutterMapState mapState) {
     final latlng = _offsetToLatLng(
-        details.localPosition, context.size!.width, context.size!.height);
+        details.localPosition, context.size!.width, context.size!.height, mapState);
 
     final tapPosition =
         TapPosition(details.globalPosition, details.localPosition);
 
     // Forward the onTap call to map.options so that we won't break onTap
-    if (map.options.onTap != null) {
-      map.options.onTap!(tapPosition, latlng);
+    if (mapState.options.onTap != null) {
+      mapState.options.onTap!(tapPosition, latlng);
     }
   }
 
@@ -266,18 +220,18 @@ class TappablePolylineLayer extends StatelessWidget {
     return distance;
   }
 
-  void _zoomMap(TapDownDetails details, BuildContext context) {
+  void _zoomMap(TapDownDetails details, BuildContext context, FlutterMapState mapState) {
     var newCenter = _offsetToLatLng(
-        details.localPosition, context.size!.width, context.size!.height);
-    map.move(newCenter, map.zoom + 0.5, source: MapEventSource.doubleTap);
+        details.localPosition, context.size!.width, context.size!.height, mapState);
+    mapState.move(newCenter, mapState.zoom + 0.5, source: MapEventSource.doubleTap);
   }
 
-  LatLng _offsetToLatLng(Offset offset, double width, double height) {
+  LatLng _offsetToLatLng(Offset offset, double width, double height, FlutterMapState mapState) {
     var localPoint = CustomPoint(offset.dx, offset.dy);
     var localPointCenterDistance =
         CustomPoint((width / 2) - localPoint.x, (height / 2) - localPoint.y);
-    var mapCenter = map.project(map.center);
+    var mapCenter = mapState.project(mapState.center);
     var point = mapCenter - localPointCenterDistance;
-    return map.unproject(point);
+    return mapState.unproject(point);
   }
 }
