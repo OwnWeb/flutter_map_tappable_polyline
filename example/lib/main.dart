@@ -67,18 +67,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: FlutterMap(
         options: MapOptions(
-          plugins: [
-            TappablePolylineMapPlugin(),
-          ],
           center: LatLng(45.1313258, 5.5171205),
           zoom: 11.0,
         ),
-        layers: [
-          TileLayerOptions(
+        children: [
+          TileLayer(
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             subdomains: ['a', 'b', 'c'],
           ),
-          TappablePolylineLayerOptions(
+          TappablePolylineLayer(
               // Will only render visible polylines, increasing performance
               polylineCulling: true,
               pointerDistanceTolerance: 20,
