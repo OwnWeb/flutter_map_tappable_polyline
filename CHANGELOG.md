@@ -1,3 +1,6 @@
+## 4.0.0+1 - 2023-04-13
+- Fixed flutter_map version in README
+
 ## 4.0.0 - 2023-04-13
 - **[BREAKING]** Upgrade `flutter_map` to 3.1.0. *Thanks [@jtthrillson](https://github.com/jtthrillson) 👏*
 - Fixed example app android embedding. *Thanks [@k5924](https://github.com/k5924)*
