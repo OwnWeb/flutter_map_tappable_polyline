@@ -1,6 +1,7 @@
 name: example
 description: A new Flutter project.
 version: 5.0.0
+publish_to: "none"
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -8,12 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_map_tappable_polyline:
+    path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_map_tappable_polyline:
-    path: ../
 
 flutter:
   uses-material-design: true
