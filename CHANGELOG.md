@@ -1,3 +1,6 @@
+## 5.0.0 - 2023-06-05
+- **[BREAKING]** Upgrade `flutter_map` to `^5.0.0`. *Thanks [@azaderdogan](https://github.com/azaderdogan) and [@JaffaKetchup](https://github.com/JaffaKetchup) 👏*
+
 ## 4.0.0+1 - 2023-04-13
 - Fixed flutter_map version in README
 
