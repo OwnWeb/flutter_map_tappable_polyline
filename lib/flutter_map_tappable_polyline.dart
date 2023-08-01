@@ -40,6 +40,9 @@ class TappablePolylineLayer extends PolylineLayer {
   /// The optional callback to call when no polyline was hit by the tap
   final void Function(TapUpDetails tapPosition)? onMiss;
 
+  /// The hit test behavior of the polyline
+  final HitTestBehavior hitTestBehavior;
+
   TappablePolylineLayer({
     this.polylines = const [],
     this.onTap,
@@ -47,6 +50,7 @@ class TappablePolylineLayer extends PolylineLayer {
     this.pointerDistanceTolerance = 15,
     super.polylineCulling = false,
     super.key,
+    this.hitTestBehavior = HitTestBehavior.translucent,
   });
 
   @override
@@ -91,7 +95,21 @@ class TappablePolylineLayer extends PolylineLayer {
           _zoomMap(details, context, mapState);
         },
         onTapUp: (TapUpDetails details) {
-          _forwardCallToMapOptions(details, context, mapState);
+          final hasTouchHitPolyline =
+              _handlePolylineTap(details, onTap, onMiss);
+
+          switch (hitTestBehavior) {
+            case HitTestBehavior.translucent:
+              _forwardCallToMapOptions(details, context, mapState);
+              break;
+            case HitTestBehavior.opaque:
+              break;
+            case HitTestBehavior.deferToChild:
+              if (!hasTouchHitPolyline) {
+                _forwardCallToMapOptions(details, context, mapState);
+              }
+              break;
+          }
           _handlePolylineTap(details, onTap, onMiss);
         },
         child: Stack(
@@ -106,7 +124,7 @@ class TappablePolylineLayer extends PolylineLayer {
     );
   }
 
-  void _handlePolylineTap(
+  bool _handlePolylineTap(
       TapUpDetails details, Function? onTap, Function? onMiss) {
     // We might hit close to multiple polylines. We will therefore keep a reference to these in this map.
     Map<double, List<TaggedPolyline>> candidates = {};
@@ -166,11 +184,15 @@ class TappablePolylineLayer extends PolylineLayer {
       }
     }
 
-    if (candidates.isEmpty) return onMiss?.call(details);
+    if (candidates.isEmpty) {
+      onMiss?.call(details);
+      return false;
+    }
 
     // We look up in the map of distances to the tap, and choose the shortest one.
     var closestToTapKey = candidates.keys.reduce(min);
     onTap!(candidates[closestToTapKey], details);
+    return true;
   }
 
   void _forwardCallToMapOptions(
