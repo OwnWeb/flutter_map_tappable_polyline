@@ -3,7 +3,7 @@ library flutter_map_tappable_polyline;
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 /// A polyline with a tag
@@ -45,27 +45,28 @@ class TappablePolylineLayer extends PolylineLayer {
     this.onTap,
     this.onMiss,
     this.pointerDistanceTolerance = 15,
-    super.polylineCulling = false,
-    super.key,
-  });
+    polylineCulling = false,
+    key,
+  }) : super(key: key, polylines: polylines, polylineCulling: polylineCulling);
 
   @override
   Widget build(BuildContext context) {
-    final map = FlutterMapState.of(context);
+    final mapCamera = MapCamera.of(context);
 
     return _build(
       context,
-      Size(map.size.x, map.size.y),
+      Size(mapCamera.size.x, mapCamera.size.y),
       polylineCulling
           ? polylines
-              .where((p) => p.boundingBox.isOverlapping(map.bounds))
+              .where(
+                  (p) => p.boundingBox.isOverlapping(mapCamera.visibleBounds))
               .toList()
           : polylines,
     );
   }
 
   Widget _build(BuildContext context, Size size, List<TaggedPolyline> lines) {
-    FlutterMapState mapState = FlutterMapState.maybeOf(context)!;
+    final mapState = MapCamera.of(context);
 
     for (TaggedPolyline polyline in lines) {
       polyline._offsets.clear();
@@ -73,7 +74,7 @@ class TappablePolylineLayer extends PolylineLayer {
       for (var point in polyline.points) {
         var pos = mapState.project(point);
         pos = (pos * mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
-            mapState.pixelOrigin;
+            mapState.pixelOrigin.toDoublePoint();
         polyline._offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
         if (i > 0 && i < polyline.points.length) {
           polyline._offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
@@ -88,10 +89,10 @@ class TappablePolylineLayer extends PolylineLayer {
           // For some strange reason i have to add this callback for the onDoubleTapDown callback to be called.
         },
         onDoubleTapDown: (TapDownDetails details) {
-          _zoomMap(details, context, mapState);
+          _zoomMap(details, context);
         },
         onTapUp: (TapUpDetails details) {
-          _forwardCallToMapOptions(details, context, mapState);
+          _forwardCallToMapOptions(details, context);
           _handlePolylineTap(details, onTap, onMiss);
         },
         child: Stack(
@@ -173,16 +174,17 @@ class TappablePolylineLayer extends PolylineLayer {
     onTap!(candidates[closestToTapKey], details);
   }
 
-  void _forwardCallToMapOptions(
-      TapUpDetails details, BuildContext context, FlutterMapState mapState) {
+  void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
     final latlng = _offsetToLatLng(details.localPosition, context.size!.width,
-        context.size!.height, mapState);
+        context.size!.height, context);
+
+    final mapOptions = MapOptions.of(context);
 
     final tapPosition =
         TapPosition(details.globalPosition, details.localPosition);
 
     // Forward the onTap call to map.options so that we won't break onTap
-    mapState.options.onTap?.call(tapPosition, latlng);
+    mapOptions.onTap?.call(tapPosition, latlng);
   }
 
   double _distance(Offset point1, Offset point2) {
@@ -194,21 +196,24 @@ class TappablePolylineLayer extends PolylineLayer {
     return distance;
   }
 
-  void _zoomMap(
-      TapDownDetails details, BuildContext context, FlutterMapState mapState) {
+  void _zoomMap(TapDownDetails details, BuildContext context) {
+    final mapCamera = MapCamera.of(context);
+    final mapController = MapController.of(context);
+
     var newCenter = _offsetToLatLng(details.localPosition, context.size!.width,
-        context.size!.height, mapState);
-    mapState.move(newCenter, mapState.zoom + 0.5,
-        source: MapEventSource.doubleTap);
+        context.size!.height, context);
+    mapController.move(newCenter, mapCamera.zoom + 0.5);
   }
 
   LatLng _offsetToLatLng(
-      Offset offset, double width, double height, FlutterMapState mapState) {
-    var localPoint = CustomPoint(offset.dx, offset.dy);
+      Offset offset, double width, double height, BuildContext context) {
+    final mapCamera = MapCamera.of(context);
+
+    var localPoint = Point(offset.dx, offset.dy);
     var localPointCenterDistance =
-        CustomPoint((width / 2) - localPoint.x, (height / 2) - localPoint.y);
-    var mapCenter = mapState.project(mapState.center);
+        Point((width / 2) - localPoint.x, (height / 2) - localPoint.y);
+    var mapCenter = mapCamera.project(mapCamera.center);
     var point = mapCenter - localPointCenterDistance;
-    return mapState.unproject(point);
+    return mapCamera.unproject(point);
   }
 }
