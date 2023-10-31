@@ -1,3 +1,6 @@
+## 6.0.0 - 2023-10-31 🎃
+- **[BREAKING]** Upgrade `flutter_map` to `^6.0.0`.
+
 ## 5.0.0 - 2023-06-05
 - **[BREAKING]** Upgrade `flutter_map` to `^5.0.0`. *Thanks [@azaderdogan](https://github.com/azaderdogan) and [@JaffaKetchup](https://github.com/JaffaKetchup) 👏*
 
