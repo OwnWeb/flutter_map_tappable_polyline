@@ -11,7 +11,7 @@ Add [`flutter_map`](https://github.com/johnpryan/flutter_map) and `flutter_map_t
 
 ```yaml
 dependencies:
-  flutter_map: ^5.0.0
+  flutter_map: ^6.0.1
   flutter_map_tappable_polyline: any # take latest version on Pub
 ```
 
