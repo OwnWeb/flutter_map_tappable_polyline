@@ -26,6 +26,11 @@ class TaggedPolyline extends Polyline {
   });
 }
 
+/// Definition of a callback when a polyline was tapped. It provides the
+/// render-box tap position, the lat-long position and the list of
+/// polylines that were hit.
+typedef TapPolylinesCallback = void Function(TapPosition position, LatLng latLng, List<TaggedPolyline>);
+
 class TappablePolylineLayer extends PolylineLayer {
   /// The list of [TaggedPolyline] which could be tapped
   @override
@@ -34,20 +39,28 @@ class TappablePolylineLayer extends PolylineLayer {
   /// The tolerated distance between pointer and user tap to trigger the [onTap] callback
   final double pointerDistanceTolerance;
 
-  /// The callback to call when a polyline was hit by the tap
-  final void Function(List<TaggedPolyline>, TapUpDetails tapPosition)? onTap;
+  /// The callback to call when a polyline was hit by the tap.
+  final TapPolylinesCallback? onTap;
+
+  /// The callback to call when a polyline was hit by the long press.
+  final TapPolylinesCallback? onLongPress;
 
   /// The optional callback to call when no polyline was hit by the tap
-  final void Function(TapUpDetails tapPosition)? onMiss;
+  final void Function(TapPosition position, LatLng latLng)? onMiss;
+
+  /// Whether to forward the hit gesture events to the parent map.
+  final bool forwardGestures;
 
   TappablePolylineLayer({
     this.polylines = const [],
     this.onTap,
+    this.onLongPress,
     this.onMiss,
     this.pointerDistanceTolerance = 15,
-    polylineCulling = false,
+    this.forwardGestures = true,
+    super.polylineCulling = false,
     key,
-  }) : super(key: key, polylines: polylines, polylineCulling: polylineCulling);
+  }) : super(key: key, polylines: polylines);
 
   @override
   Widget build(BuildContext context) {
@@ -66,15 +79,15 @@ class TappablePolylineLayer extends PolylineLayer {
   }
 
   Widget _build(BuildContext context, Size size, List<TaggedPolyline> lines) {
-    final mapState = MapCamera.of(context);
+    final MapCamera mapCamera = MapCamera.of(context);
 
     for (TaggedPolyline polyline in lines) {
       polyline._offsets.clear();
       var i = 0;
       for (var point in polyline.points) {
-        var pos = mapState.project(point);
-        pos = (pos * mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
-            mapState.pixelOrigin.toDoublePoint();
+        var pos = mapCamera.project(point);
+        pos = (pos * mapCamera.getZoomScale(mapCamera.zoom, mapCamera.zoom)) - 
+            mapCamera.pixelOrigin.toDoublePoint();
         polyline._offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
         if (i > 0 && i < polyline.points.length) {
           polyline._offsets.add(Offset(pos.x.toDouble(), pos.y.toDouble()));
@@ -92,13 +105,25 @@ class TappablePolylineLayer extends PolylineLayer {
           _zoomMap(details, context);
         },
         onTapUp: (TapUpDetails details) {
-          _forwardCallToMapOptions(details, context);
-          _handlePolylineTap(details, onTap, onMiss);
+          _handleGesture(
+            context,
+            TapPosition(details.globalPosition, details.localPosition),
+            onTap,
+            MapOptions.of(context).onTap,
+          );
+        },
+        onLongPressStart: (LongPressStartDetails details) {
+          _handleGesture(
+            context,
+            TapPosition(details.globalPosition, details.localPosition),
+            onLongPress,
+            MapOptions.of(context).onLongPress,
+          );
         },
         child: Stack(
           children: [
             CustomPaint(
-              painter: PolylinePainter(lines, mapState),
+              painter: PolylinePainter(lines, mapCamera),
               size: size,
             ),
           ],
@@ -107,8 +132,40 @@ class TappablePolylineLayer extends PolylineLayer {
     );
   }
 
-  void _handlePolylineTap(
-      TapUpDetails details, Function? onTap, Function? onMiss) {
+  void _handleGesture(
+    final BuildContext context,
+    final TapPosition tapPosition,
+    final TapPolylinesCallback? callback,
+    final void Function(TapPosition tapPosition, LatLng point)? parentCallback,
+  ) {
+    // Get the current map camera and options.
+    final MapCamera mapCamera = MapCamera.of(context);
+
+    // Convert the tap offset-position to geographical coordinates.
+    final LatLng latlng = mapCamera.offsetToCrs(tapPosition.relative!);
+
+    if (callback == null && parentCallback == null) {
+      // This layer shall be translucent to hits.
+      parentCallback?.call(tapPosition, latlng);
+
+      onMiss?.call(tapPosition, latlng);
+    } else {
+      final List<TaggedPolyline> polylines = _getHitPolylines(tapPosition);
+      if (polylines.isEmpty) {
+        // This layer shall be translucent to miss hits.
+        parentCallback?.call(tapPosition, latlng);
+
+        onMiss?.call(tapPosition, latlng);
+      } else {
+        // Forward the gesture to the parent map if requested.
+        if (forwardGestures) parentCallback?.call(tapPosition, latlng);
+
+        callback?.call(tapPosition, latlng, polylines);
+      }
+    }
+  }
+
+  List<TaggedPolyline> _getHitPolylines(TapPosition tapPosition) {
     // We might hit close to multiple polylines. We will therefore keep a reference to these in this map.
     Map<double, List<TaggedPolyline>> candidates = {};
 
@@ -121,7 +178,7 @@ class TappablePolylineLayer extends PolylineLayer {
         // We consider the points point1, point2 and tap points in a triangle
         var point1 = currentPolyline._offsets[j];
         var point2 = currentPolyline._offsets[j + 1];
-        var tap = details.localPosition;
+        var tap = tapPosition.relative!;
 
         // To determine if we have tapped in between two po ints, we
         // calculate the length from the tapped point to the line
@@ -167,24 +224,11 @@ class TappablePolylineLayer extends PolylineLayer {
       }
     }
 
-    if (candidates.isEmpty) return onMiss?.call(details);
+    if (candidates.isEmpty) return [];
 
     // We look up in the map of distances to the tap, and choose the shortest one.
     var closestToTapKey = candidates.keys.reduce(min);
-    onTap!(candidates[closestToTapKey], details);
-  }
-
-  void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
-    final latlng = _offsetToLatLng(details.localPosition, context.size!.width,
-        context.size!.height, context);
-
-    final mapOptions = MapOptions.of(context);
-
-    final tapPosition =
-        TapPosition(details.globalPosition, details.localPosition);
-
-    // Forward the onTap call to map.options so that we won't break onTap
-    mapOptions.onTap?.call(tapPosition, latlng);
+    return candidates[closestToTapKey]!;
   }
 
   double _distance(Offset point1, Offset point2) {
@@ -200,20 +244,7 @@ class TappablePolylineLayer extends PolylineLayer {
     final mapCamera = MapCamera.of(context);
     final mapController = MapController.of(context);
 
-    var newCenter = _offsetToLatLng(details.localPosition, context.size!.width,
-        context.size!.height, context);
+    var newCenter = mapCamera.offsetToCrs(details.localPosition);
     mapController.move(newCenter, mapCamera.zoom + 0.5);
-  }
-
-  LatLng _offsetToLatLng(
-      Offset offset, double width, double height, BuildContext context) {
-    final mapCamera = MapCamera.of(context);
-
-    var localPoint = Point(offset.dx, offset.dy);
-    var localPointCenterDistance =
-        Point((width / 2) - localPoint.x, (height / 2) - localPoint.y);
-    var mapCenter = mapCamera.project(mapCamera.center);
-    var point = mapCenter - localPointCenterDistance;
-    return mapCamera.unproject(point);
   }
 }
