@@ -102,13 +102,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   strokeWidth: 3.0,
                 ),
               ],
-              onTap: (polylines, tapPosition) => print('Tapped: ' +
+              onTap: (tapPosition, latLong, polylines) => print('Tapped: ' +
                   polylines.map((polyline) => polyline.tag).join(',') +
                   ' at ' +
-                  tapPosition.globalPosition.toString()),
-              onMiss: (tapPosition) {
-                print('No polyline was tapped at position ' +
-                    tapPosition.globalPosition.toString());
+                  tapPosition.global.toString()),
+              onLongPress: (tapPosition, latLong, polylines) => print('Long-press: ' +
+                  polylines.map((polyline) => polyline.tag).join(',') +
+                  ' at coordinates $latLong and screen position ' +
+                  tapPosition.global.toString()),
+              onMiss: (tapPosition, latLong) {
+                print('No polylines were tapped at coordinates $latLong and screen position '
+                    + tapPosition.global.toString());
               })
         ],
       ),
