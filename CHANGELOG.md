@@ -1,3 +1,6 @@
+## 7.0.0 - 2024-07-09
+- **[BREAKING]** Upgrade `flutter_map` to `^7.0.0`.
+
 ## 6.0.0 - 2023-10-31 🎃
 - **[BREAKING]** Upgrade `flutter_map` to `^6.0.0`.
 
