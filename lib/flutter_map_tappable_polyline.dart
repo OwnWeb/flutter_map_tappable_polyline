@@ -1,3 +1,6 @@
+// Changes: 
+// 16.02.2024, integration of onLongPress by jpgorganizer
+
 library flutter_map_tappable_polyline;
 
 import 'dart:math';
@@ -37,12 +40,19 @@ class TappablePolylineLayer extends PolylineLayer {
   /// The callback to call when a polyline was hit by the tap
   final void Function(List<TaggedPolyline>, TapUpDetails tapPosition)? onTap;
 
+  /// The callback to call when a polyline was hit by longPress
+  final void Function(List<TaggedPolyline>, LongPressStartDetails tapPosition)? onLongPress;
+
   /// The optional callback to call when no polyline was hit by the tap
-  final void Function(TapUpDetails tapPosition)? onMiss;
+  /// 
+  /// dynamic type is TapUpDetails || LongPressStartDetails
+  /// depending on event
+  final void Function(dynamic tapPosition)? onMiss;
 
   TappablePolylineLayer({
     this.polylines = const [],
     this.onTap,
+    this.onLongPress,
     this.onMiss,
     this.pointerDistanceTolerance = 15,
     polylineCulling = false,
@@ -95,6 +105,10 @@ class TappablePolylineLayer extends PolylineLayer {
           _forwardCallToMapOptions(details, context);
           _handlePolylineTap(details, onTap, onMiss);
         },
+        onLongPressStart:(LongPressStartDetails details) { 
+          _forwardCallToMapOptionsLongPress(details, context);
+          _handlePolylineTap(details, onLongPress, onMiss);          
+        },
         child: Stack(
           children: [
             CustomPaint(
@@ -108,7 +122,7 @@ class TappablePolylineLayer extends PolylineLayer {
   }
 
   void _handlePolylineTap(
-      TapUpDetails details, Function? onTap, Function? onMiss) {
+      /*TapUpDetails*/ details, Function? onTap, Function? onMiss) {
     // We might hit close to multiple polylines. We will therefore keep a reference to these in this map.
     Map<double, List<TaggedPolyline>> candidates = {};
 
@@ -174,7 +188,6 @@ class TappablePolylineLayer extends PolylineLayer {
     onTap!(candidates[closestToTapKey], details);
   }
 
-  void _forwardCallToMapOptions(TapUpDetails details, BuildContext context) {
     final latlng = _offsetToLatLng(details.localPosition, context.size!.width,
         context.size!.height, context);
 
@@ -185,6 +198,19 @@ class TappablePolylineLayer extends PolylineLayer {
 
     // Forward the onTap call to map.options so that we won't break onTap
     mapOptions.onTap?.call(tapPosition, latlng);
+  }
+
+  void _forwardCallToMapOptionsLongPress( details, BuildContext context,) {
+    final latlng = _offsetToLatLng(details.localPosition, context.size!.width,
+        context.size!.height, context);
+
+    final mapOptions = MapOptions.of(context);
+
+    final tapPosition =
+        TapPosition(details.globalPosition, details.localPosition);
+
+    // Forward the onLongPress call to map.options so that we won't break onLongPress
+    mapOptions.onLongPress?.call(tapPosition, latlng);
   }
 
   double _distance(Offset point1, Offset point2) {
